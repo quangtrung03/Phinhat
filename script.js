@@ -125,11 +125,12 @@ function getPoints() {
     // Quét pixel để tạo danh sách điểm mục tiêu
     const data = ctx.getImageData(0, 0, width, height).data;
     const points = [];
-    const step = isMobile ? 2 : 5; // Khoảng cách giữa các hạt
+    const step = isMobile ? 1 : 5; // Mobile lấy mẫu dày hơn để đủ nét
+    const alphaThreshold = isMobile ? 48 : 128; // Giữ lại nhiều pixel viền trên màn hình nhỏ
     
     for (let y = 0; y < height; y += step) {
         for (let x = 0; x < width; x += step) {
-            if (data[(y * width + x) * 4 + 3] > 128) {
+            if (data[(y * width + x) * 4 + 3] > alphaThreshold) {
                 points.push({ x, y });
             }
         }
