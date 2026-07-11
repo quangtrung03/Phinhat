@@ -186,7 +186,7 @@ function loop(time) {
     matrixCtx.fillStyle = "rgba(0, 0, 0, 0.05)";
     matrixCtx.fillRect(0, 0, width, height);
         
-    matrixCtx.fillStyle = "rgba(245, 247, 248, 0.8)"; 
+    matrixCtx.fillStyle = "rgba(9, 226, 246, 0.8)"; 
     matrixCtx.font = `${matrixFontSize}px monospace`;
     
     for (let i = 0; i < columns.length; i++) {
@@ -233,7 +233,7 @@ function loop(time) {
             if (phaseType === "htmlHeart" && p.isActive) {
                 particleCtx.fillStyle = "#d60dd9";
             } else {
-                particleCtx.fillStyle = "#0202f6"; 
+                particleCtx.fillStyle = "#02f2f6"; 
             }
             
             // SỬA Ở ĐÂY: Dùng Math.round để ép tọa độ về số nguyên. 
