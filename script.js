@@ -1,4 +1,7 @@
 const MESSAGES = [
+    "3",
+    "2",
+    "1",
     "Em ơiii",
     "Em có\nyêu anh không?",
     "Anh thích em\nmất rồi",
@@ -12,7 +15,7 @@ const particleCanvas = document.getElementById("particleCanvas");
 const matrixCtx = matrixCanvas.getContext("2d", { alpha: false });
 const particleCtx = particleCanvas.getContext("2d", { alpha: true });
 
-let width, height, isMobile;
+let width, height, isMobile, dpr;
 let particles = [];
 let messageIndex = 0;
 let phaseIndex = 0;
@@ -34,12 +37,17 @@ function resize() {
     width = window.innerWidth;
     height = window.innerHeight;
     isMobile = width < 768;
+    dpr = window.devicePixelRatio || 1;
     
-    // Tự động chỉnh cỡ chữ to hơn cho Mobile, nhỏ lại một chút cho Desktop
-    matrixFontSize = isMobile ? 24 : 18; 
+    // Tăng mật độ ký tự trên mobile và giữ canvas sắc nét theo DPR
+    matrixFontSize = isMobile ? 14 : 18; 
     
-    matrixCanvas.width = particleCanvas.width = width;
-    matrixCanvas.height = particleCanvas.height = height;
+    matrixCanvas.width = particleCanvas.width = Math.round(width * dpr);
+    matrixCanvas.height = particleCanvas.height = Math.round(height * dpr);
+    matrixCanvas.style.width = particleCanvas.style.width = `${width}px`;
+    matrixCanvas.style.height = particleCanvas.style.height = `${height}px`;
+    matrixCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    particleCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
     
     // Khởi tạo/Cập nhật lại các cột mưa ma trận khi resize
     const colCount = Math.floor(width / matrixFontSize) + 1;
@@ -101,7 +109,7 @@ function getPoints() {
         ctx.fillStyle = "white";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        let fSize = isMobile ? Math.min(width * 0.12, 40) : Math.min(width * 0.06, 80);
+        let fSize = isMobile ? Math.min(width * 0.09, 30) : Math.min(width * 0.06, 80);
         ctx.font = `bold ${fSize}px "Segoe UI", Arial, sans-serif`;
         
         let text = MESSAGES[messageIndex];
@@ -117,7 +125,7 @@ function getPoints() {
     // Quét pixel để tạo danh sách điểm mục tiêu
     const data = ctx.getImageData(0, 0, width, height).data;
     const points = [];
-    const step = isMobile ? 4 : 5; // Khoảng cách giữa các hạt
+    const step = isMobile ? 2 : 5; // Khoảng cách giữa các hạt
     
     for (let y = 0; y < height; y += step) {
         for (let x = 0; x < width; x += step) {
@@ -186,7 +194,7 @@ function loop(time) {
     matrixCtx.fillStyle = "rgba(0, 0, 0, 0.05)";
     matrixCtx.fillRect(0, 0, width, height);
         
-    matrixCtx.fillStyle = "rgba(9, 226, 246, 0.8)"; 
+    matrixCtx.fillStyle = "rgba(177, 184, 185, 0.8)"; 
     matrixCtx.font = `${matrixFontSize}px monospace`;
     
     for (let i = 0; i < columns.length; i++) {
@@ -215,7 +223,7 @@ function loop(time) {
     // 3. Vẽ Foreground
     particleCtx.clearRect(0, 0, width, height);
     
-    const rectSize = isMobile ? 3 : 4;
+    const rectSize = isMobile ? 2 : 4;
 
     particles.forEach(p => {
         const dx = p.targetX - p.x;
@@ -231,9 +239,9 @@ function loop(time) {
             particleCtx.globalAlpha = p.opacity;
 
             if (phaseType === "htmlHeart" && p.isActive) {
-                particleCtx.fillStyle = "#d60dd9";
+                particleCtx.fillStyle = "#c115c4";
             } else {
-                particleCtx.fillStyle = "#02f2f6"; 
+                particleCtx.fillStyle = "#1c46f1"; 
             }
             
             // SỬA Ở ĐÂY: Dùng Math.round để ép tọa độ về số nguyên. 
