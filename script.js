@@ -95,10 +95,12 @@ function drawHtmlHeart(ctx) {
 
 // Hàm cốt lõi: Vẽ chữ/trái tim ra canvas ẩn và lấy tọa độ pixel
 function getPoints() {
+    const sampleScale = isMobile ? 2 : 1;
     const off = document.createElement("canvas");
-    off.width = width;
-    off.height = height;
+    off.width = Math.round(width * sampleScale);
+    off.height = Math.round(height * sampleScale);
     const ctx = off.getContext("2d");
+    ctx.setTransform(sampleScale, 0, 0, sampleScale, 0, 0);
     const phaseType = getPhaseType();
 
     if (phaseType === "htmlHeart") {
@@ -123,15 +125,17 @@ function getPoints() {
     }
 
     // Quét pixel để tạo danh sách điểm mục tiêu
-    const data = ctx.getImageData(0, 0, width, height).data;
+    const sampleWidth = off.width;
+    const sampleHeight = off.height;
+    const data = ctx.getImageData(0, 0, sampleWidth, sampleHeight).data;
     const points = [];
-    const step = isMobile ? 1 : 5; // Mobile lấy mẫu dày hơn để đủ nét
-    const alphaThreshold = isMobile ? 48 : 128; // Giữ lại nhiều pixel viền trên màn hình nhỏ
+    const step = isMobile ? 2 : 5;
+    const alphaThreshold = isMobile ? 40 : 128;
     
-    for (let y = 0; y < height; y += step) {
-        for (let x = 0; x < width; x += step) {
-            if (data[(y * width + x) * 4 + 3] > alphaThreshold) {
-                points.push({ x, y });
+    for (let y = 0; y < sampleHeight; y += step) {
+        for (let x = 0; x < sampleWidth; x += step) {
+            if (data[(y * sampleWidth + x) * 4 + 3] > alphaThreshold) {
+                points.push({ x: x / sampleScale, y: y / sampleScale });
             }
         }
     }
