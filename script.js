@@ -2,7 +2,7 @@ const MESSAGES = [
     "Em ơiii",
     "Em có\nyêu anh không?",
     "Anh thích em\nmất rồi",
-    "Làm người yêu\nanh nhé !!" // Chữ kết thúc, sau đó sẽ chuyển sang Trái Tim
+    "Làm người yêu\nanh nhé !!" 
 ];
 
 const CHAR_SET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
@@ -15,7 +15,7 @@ const particleCtx = particleCanvas.getContext("2d", { alpha: true });
 let width, height, isMobile;
 let particles = [];
 let messageIndex = 0;
-let isHeartPhase = false;
+let phaseIndex = 0;
 let lastTime = 0;
 let phaseTimer = 0;
 
@@ -51,27 +51,77 @@ function resize() {
     }));
 }
 
+function getPhaseType() {
+    if (phaseIndex < MESSAGES.length) {
+        return "text";
+    }
+
+    if (phaseIndex === MESSAGES.length) {
+        return "pinkHeart";
+    }
+
+    return "htmlHeart";
+}
+
+function drawPinkHeart(ctx) {
+    const size = Math.min(width, height) * 0.2;
+    const cx = width / 2;
+    const cy = height / 2 - size * 0.2;
+
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.beginPath();
+    ctx.moveTo(0, size * 0.3);
+    ctx.bezierCurveTo(size * 0.5, -size * 0.3, size * 1.1, size * 0.1, 0, size);
+    ctx.bezierCurveTo(-size * 1.1, size * 0.1, -size * 0.5, -size * 0.3, 0, size * 0.3);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+}
+
+function drawHtmlHeart(ctx) {
+    const scale = Math.min(width, height) * 0.0017;
+    const centerX = width / 2;
+    const centerY = height / 2 - Math.min(width, height) * 0.05;
+
+    ctx.save();
+    ctx.beginPath();
+
+    for (let t = -Math.PI; t <= Math.PI; t += 0.01) {
+        const x = 160 * Math.pow(Math.sin(t), 3);
+        const y = 130 * Math.cos(t) - 50 * Math.cos(2 * t) - 20 * Math.cos(3 * t) - 10 * Math.cos(4 * t) + 25;
+        const px = centerX + x * scale;
+        const py = centerY - y * scale;
+
+        if (t === -Math.PI) {
+            ctx.moveTo(px, py);
+        } else {
+            ctx.lineTo(px, py);
+        }
+    }
+
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+}
+
 // Hàm cốt lõi: Vẽ chữ/trái tim ra canvas ẩn và lấy tọa độ pixel
 function getPoints() {
     const off = document.createElement("canvas");
     off.width = width;
     off.height = height;
     const ctx = off.getContext("2d");
-    ctx.fillStyle = "white";
+    const phaseType = getPhaseType();
 
-    if (isHeartPhase) {
-        // Vẽ trái tim hoàn hảo bằng Bezier Curve
-        const size = Math.min(width, height) * 0.2;
-        const cx = width / 2;
-        const cy = height / 2 - size * 0.2;
-        ctx.translate(cx, cy);
-        ctx.beginPath();
-        ctx.moveTo(0, size * 0.3);
-        ctx.bezierCurveTo(size * 0.5, -size * 0.3, size * 1.1, size * 0.1, 0, size);
-        ctx.bezierCurveTo(-size * 1.1, size * 0.1, -size * 0.5, -size * 0.3, 0, size * 0.3);
-        ctx.fill();
+    if (phaseType === "pinkHeart") {
+        ctx.fillStyle = "#e43e9c";
+        drawPinkHeart(ctx);
+    } else if (phaseType === "htmlHeart") {
+        ctx.fillStyle = "#f50b02";
+        drawHtmlHeart(ctx);
     } else {
         // Vẽ chữ hỗ trợ xuống dòng
+        ctx.fillStyle = "white";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         let fSize = isMobile ? Math.min(width * 0.12, 40) : Math.min(width * 0.06, 80);
@@ -139,22 +189,21 @@ function loop(time) {
     const dt = time - lastTime;
     lastTime = time;
 
-    // 1. Quản lý thời gian đổi chữ
+    // 1. Quản lý thời gian đổi cảnh
     phaseTimer += dt;
     if (phaseTimer > 4000) {
         phaseTimer = 0;
-        if (!isHeartPhase) {
-            if (messageIndex >= MESSAGES.length - 1) {
-                isHeartPhase = true;
-            } else {
-                messageIndex++;
-            }
-        } else {
-            isHeartPhase = false;
+        phaseIndex = (phaseIndex + 1) % (MESSAGES.length + 2);
+
+        if (phaseIndex < MESSAGES.length) {
+            messageIndex = phaseIndex;
+        } else if (phaseIndex === 0) {
             messageIndex = 0;
         }
         nextPhase();
     }
+
+    const phaseType = getPhaseType();
 
     // 2. Vẽ Mưa Ma trận (Background)
     matrixCtx.fillStyle = "rgba(0, 0, 0, 0.05)";
@@ -204,8 +253,10 @@ function loop(time) {
         if (p.opacity > 0.05) {
             particleCtx.globalAlpha = p.opacity;
 
-            if (isHeartPhase && p.isActive) {
+            if (phaseType === "pinkHeart" && p.isActive) {
                 particleCtx.fillStyle = "#e43e9c"; 
+            } else if (phaseType === "htmlHeart" && p.isActive) {
+                particleCtx.fillStyle = "#f50b02";
             } else {
                 particleCtx.fillStyle = "#ffffff"; 
             }
