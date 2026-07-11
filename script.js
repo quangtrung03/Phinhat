@@ -39,8 +39,8 @@ function resize() {
     isMobile = width < 768;
     dpr = window.devicePixelRatio || 1;
     
-    // Tăng mật độ ký tự trên mobile và giữ canvas sắc nét theo DPR
-    matrixFontSize = isMobile ? 14 : 18; 
+    // Mobile dùng ký tự nhỏ để nền dày hơn, desktop giữ nguyên
+    matrixFontSize = isMobile ? 8 : 18; 
     
     matrixCanvas.width = particleCanvas.width = Math.round(width * dpr);
     matrixCanvas.height = particleCanvas.height = Math.round(height * dpr);
@@ -95,7 +95,7 @@ function drawHtmlHeart(ctx) {
 
 // Hàm cốt lõi: Vẽ chữ/trái tim ra canvas ẩn và lấy tọa độ pixel
 function getPoints() {
-    const sampleScale = isMobile ? 2 : 1;
+    const sampleScale = isMobile ? Math.max(1, dpr) : 1;
     const off = document.createElement("canvas");
     off.width = Math.round(width * sampleScale);
     off.height = Math.round(height * sampleScale);
@@ -111,7 +111,7 @@ function getPoints() {
         ctx.fillStyle = "white";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        let fSize = isMobile ? Math.min(width * 0.09, 30) : Math.min(width * 0.06, 80);
+        let fSize = isMobile ? Math.min(width * 0.08, 24) : Math.min(width * 0.06, 80);
         ctx.font = `bold ${fSize}px "Segoe UI", Arial, sans-serif`;
         
         let text = MESSAGES[messageIndex];
@@ -129,8 +129,8 @@ function getPoints() {
     const sampleHeight = off.height;
     const data = ctx.getImageData(0, 0, sampleWidth, sampleHeight).data;
     const points = [];
-    const step = isMobile ? 2 : 5;
-    const alphaThreshold = isMobile ? 40 : 128;
+    const step = isMobile ? 1 : 4;
+    const alphaThreshold = isMobile ? 10 : 80;
     
     for (let y = 0; y < sampleHeight; y += step) {
         for (let x = 0; x < sampleWidth; x += step) {
@@ -228,7 +228,7 @@ function loop(time) {
     // 3. Vẽ Foreground
     particleCtx.clearRect(0, 0, width, height);
     
-    const rectSize = isMobile ? 2 : 4;
+    const rectSize = isMobile ? 1.5 : 4;
 
     particles.forEach(p => {
         const dx = p.targetX - p.x;
