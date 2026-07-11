@@ -56,27 +56,7 @@ function getPhaseType() {
         return "text";
     }
 
-    if (phaseIndex === MESSAGES.length) {
-        return "pinkHeart";
-    }
-
     return "htmlHeart";
-}
-
-function drawPinkHeart(ctx) {
-    const size = Math.min(width, height) * 0.2;
-    const cx = width / 2;
-    const cy = height / 2 - size * 0.2;
-
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.beginPath();
-    ctx.moveTo(0, size * 0.3);
-    ctx.bezierCurveTo(size * 0.5, -size * 0.3, size * 1.1, size * 0.1, 0, size);
-    ctx.bezierCurveTo(-size * 1.1, size * 0.1, -size * 0.5, -size * 0.3, 0, size * 0.3);
-    ctx.closePath();
-    ctx.fill();
-    ctx.restore();
 }
 
 function drawHtmlHeart(ctx) {
@@ -113,10 +93,7 @@ function getPoints() {
     const ctx = off.getContext("2d");
     const phaseType = getPhaseType();
 
-    if (phaseType === "pinkHeart") {
-        ctx.fillStyle = "#e43e9c";
-        drawPinkHeart(ctx);
-    } else if (phaseType === "htmlHeart") {
+    if (phaseType === "htmlHeart") {
         ctx.fillStyle = "#f50b02";
         drawHtmlHeart(ctx);
     } else {
@@ -193,7 +170,7 @@ function loop(time) {
     phaseTimer += dt;
     if (phaseTimer > 4000) {
         phaseTimer = 0;
-        phaseIndex = (phaseIndex + 1) % (MESSAGES.length + 2);
+        phaseIndex = (phaseIndex + 1) % (MESSAGES.length + 1);
 
         if (phaseIndex < MESSAGES.length) {
             messageIndex = phaseIndex;
@@ -253,9 +230,7 @@ function loop(time) {
         if (p.opacity > 0.05) {
             particleCtx.globalAlpha = p.opacity;
 
-            if (phaseType === "pinkHeart" && p.isActive) {
-                particleCtx.fillStyle = "#e43e9c"; 
-            } else if (phaseType === "htmlHeart" && p.isActive) {
+            if (phaseType === "htmlHeart" && p.isActive) {
                 particleCtx.fillStyle = "#f50b02";
             } else {
                 particleCtx.fillStyle = "#ffffff"; 
