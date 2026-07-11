@@ -231,9 +231,9 @@ function loop(time) {
             particleCtx.globalAlpha = p.opacity;
 
             if (phaseType === "htmlHeart" && p.isActive) {
-                particleCtx.fillStyle = "#f50b02";
+                particleCtx.fillStyle = "#d60dd9";
             } else {
-                particleCtx.fillStyle = "#ffffff"; 
+                particleCtx.fillStyle = "#0202f6"; 
             }
             
             // SỬA Ở ĐÂY: Dùng Math.round để ép tọa độ về số nguyên. 
