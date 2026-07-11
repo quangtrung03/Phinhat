@@ -8,7 +8,7 @@ const MESSAGES = [
     "Làm người yêu\nanh nhé !!" 
 ];
 
-const CHAR_SET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+const CHAR_SET = "|OU|VH";
 
 const matrixCanvas = document.getElementById("matrixCanvas");
 const particleCanvas = document.getElementById("particleCanvas");
@@ -241,7 +241,7 @@ function loop(time) {
             if (phaseType === "htmlHeart" && p.isActive) {
                 particleCtx.fillStyle = "#c115c4";
             } else {
-                particleCtx.fillStyle = "#1c46f1"; 
+                particleCtx.fillStyle = "#4caff1"; 
             }
             
             // SỬA Ở ĐÂY: Dùng Math.round để ép tọa độ về số nguyên. 
